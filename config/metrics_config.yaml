@@ -1,0 +1,75 @@
+# 6-Metric Baseline Pipeline Configuration
+
+pipeline:
+  name: "6-metric-baseline"
+  version: "1.0.0"
+  
+# Core metrics (always computed)
+core_metrics:
+  - mtld                      # Lexical diversity
+  - nominalization_density    # Derived nominalizations per 1k words
+  - modal_epistemic_rate      # Modals and epistemic markers per 100 words
+  - clause_complexity         # Mean clausal dependencies per sentence
+  - passive_voice_ratio       # Proportion of passive sentences
+  - s2s_cosine_similarity     # Mean sentence-to-sentence cosine
+
+# Processing settings
+processing:
+  batch_size: 32              # Batch size for spaCy parsing
+  workers: 1                  # Number of spaCy workers (multiprocessing)
+  cache_enabled: true         # Enable disk caching
+  
+# spaCy settings
+spacy:
+  model: "en_core_web_lg"     # Preferred model (fallback to sm if unavailable)
+  disabled_pipes:             # Pipes to disable for speed
+    - "ner"
+    
+# Embedding settings (for s2s_cosine_similarity)
+embeddings:
+  enabled: false              # Disabled by default (use --enable-embeddings)
+  model: "all-MiniLM-L6-v2"   # Sentence-transformers model
+  batch_size: 32
+  cache_enabled: true
+
+# IRAL lexical explainability (optional)
+irral_lexical:
+  enabled: false              # Disabled by default (use --enable-irral-lexical)
+  min_count: 5                # Minimum token frequency
+  top_k: 100                  # Number of top items to extract
+  
+# Statistical analysis
+statistics:
+  methods:
+    - welch_ttest             # Welch's t-test (unequal variances)
+    - mann_whitney_u          # Mann-Whitney U (non-parametric)
+  effect_size: cohens_d       # Effect size metric
+  corrections:                # Multiple testing corrections
+    - holm
+    - benjamini_hochberg
+  alpha: 0.05                 # Significance level
+
+# Visualization
+visualization:
+  style: "iral"               # IRAL journal style
+  dpi: 300                    # Figure DPI
+  formats:
+    - png
+  plots:
+    - violin
+    - radar
+    - keyword_barplot
+
+# Data validation
+validation:
+  min_word_count: 20          # Minimum words per document
+  auto_detect_columns: true   # Auto-detect text/label/topic columns
+  
+# Output settings
+output:
+  formats:
+    - parquet                 # Primary format (compressed)
+    - csv                     # Secondary format (readable)
+  schema_file: "metrics_schema.json"
+  create_subdirs: true        # Create figures/, tables/, lexical/ subdirs
+

@@ -1,0 +1,198 @@
+{
+  "schema_version": "1.0",
+  "description": "Final 15-metric core schema for AIvsHuman pipeline",
+  "metric_families": [
+    {
+      "family": "Lexical Diversity",
+      "metrics": [
+        {
+          "name": "mtld",
+          "type": "float",
+          "description": "Measure of Textual Lexical Diversity",
+          "range": [0, null],
+          "null_allowed": false
+        },
+        {
+          "name": "hdd",
+          "type": "float",
+          "description": "HD-D hypergeometric diversity",
+          "range": [0, 1],
+          "null_allowed": false
+        }
+      ]
+    },
+    {
+      "family": "Syntactic Complexity",
+      "metrics": [
+        {
+          "name": "depth_p10",
+          "type": "float",
+          "description": "10th percentile of dependency tree depth",
+          "range": [0, null],
+          "null_allowed": false
+        },
+        {
+          "name": "depth_p50",
+          "type": "float",
+          "description": "50th percentile (median) of dependency tree depth",
+          "range": [0, null],
+          "null_allowed": false
+        },
+        {
+          "name": "depth_p90",
+          "type": "float",
+          "description": "90th percentile of dependency tree depth",
+          "range": [0, null],
+          "null_allowed": false
+        },
+        {
+          "name": "advcl_per1k",
+          "type": "float",
+          "description": "Adverbial clauses per 1000 words",
+          "range": [0, null],
+          "null_allowed": false
+        },
+        {
+          "name": "ccomp_per1k",
+          "type": "float",
+          "description": "Clausal complements per 1000 words",
+          "range": [0, null],
+          "null_allowed": false
+        },
+        {
+          "name": "acl_per1k",
+          "type": "float",
+          "description": "Adjectival clauses per 1000 words",
+          "range": [0, null],
+          "null_allowed": false
+        },
+        {
+          "name": "passive_ratio",
+          "type": "float",
+          "description": "Proportion of passive voice constructions",
+          "range": [0, 1],
+          "null_allowed": false
+        },
+        {
+          "name": "pos_entropy",
+          "type": "float",
+          "description": "Entropy of POS bigram distribution",
+          "range": [0, null],
+          "null_allowed": false
+        }
+      ]
+    },
+    {
+      "family": "Discourse & Modality",
+      "metrics": [
+        {
+          "name": "modal_verbs_per1k",
+          "type": "float",
+          "description": "Modal verbs per 1000 words",
+          "range": [0, null],
+          "null_allowed": false
+        },
+        {
+          "name": "epistemic_markers_per1k",
+          "type": "float",
+          "description": "Epistemic markers per 1000 words",
+          "range": [0, null],
+          "null_allowed": false
+        },
+        {
+          "name": "discourse_contingency_per1k",
+          "type": "float",
+          "description": "Contingency discourse markers per 1000 words",
+          "range": [0, null],
+          "null_allowed": false
+        },
+        {
+          "name": "entity_specificity",
+          "type": "float",
+          "description": "Weighted named entity specificity score",
+          "range": [0, null],
+          "null_allowed": false
+        }
+      ]
+    },
+    {
+      "family": "Semantic Embeddings",
+      "metrics": [
+        {
+          "name": "topical_drift",
+          "type": "float",
+          "description": "Cosine distance between first and last paragraph embeddings",
+          "range": [0, 2],
+          "null_allowed": true,
+          "disabled_in_fast_mode": true
+        },
+        {
+          "name": "s2s_similarity",
+          "type": "float",
+          "description": "Average sentence-to-sentence cosine similarity",
+          "range": [0, 1],
+          "null_allowed": true,
+          "disabled_in_fast_mode": true
+        },
+        {
+          "name": "centroid_distance",
+          "type": "float",
+          "description": "Distance from human-topic centroid embedding",
+          "range": [0, 2],
+          "null_allowed": true,
+          "disabled_in_fast_mode": true
+        }
+      ]
+    },
+    {
+      "family": "Language Model Based",
+      "metrics": [
+        {
+          "name": "ppl_mean",
+          "type": "float",
+          "description": "Mean perplexity across models",
+          "range": [0, null],
+          "null_allowed": true,
+          "disabled_in_fast_mode": true
+        },
+        {
+          "name": "surprisal_variance",
+          "type": "float",
+          "description": "Variance of token-level surprisal",
+          "range": [0, null],
+          "null_allowed": true,
+          "disabled_in_fast_mode": true
+        },
+        {
+          "name": "nominalization_density",
+          "type": "float",
+          "description": "Nominalization count per 1000 words",
+          "range": [0, null],
+          "null_allowed": false
+        }
+      ]
+    }
+  ],
+  "metadata_columns": [
+    {
+      "name": "word_count",
+      "type": "int",
+      "description": "Total word count"
+    },
+    {
+      "name": "sentence_count",
+      "type": "int",
+      "description": "Total sentence count"
+    },
+    {
+      "name": "label",
+      "type": "string",
+      "description": "Document label (Human/AI)"
+    }
+  ],
+  "notes": [
+    "Some metrics return 0.0 when text is too short (MTLD requires >100 tokens)",
+    "Heavy metrics (embeddings, perplexity) may be null/zero in fast mode",
+    "Additional columns like vocd, parataxis_per1k may be present but are not part of core 15"
+  ]
+}

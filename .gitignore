@@ -1,0 +1,92 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyc
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Virtual Environment
+.venv/
+venv/
+ENV/
+env/
+.conda/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.ipynb_checkpoints/
+
+# Cache directories (heavy)
+cache/
+**/cache/
+results/*/cache/
+results/gpt4_100pairs/cache/
+results/gpt4_100pairs_analysis/cache/
+results/smoke_test/cache/
+results/stub_analysis/cache/
+results/stub_improved_analysis/cache/
+results/stub_improved_with_embeddings/cache/
+
+# Results directories (can be large)
+results/
+*.parquet
+*.feather
+
+# Model files (heavy)
+models/
+*.bin
+*.pt
+*.pth
+*.h5
+*.ckpt
+*.safetensors
+
+# Embeddings (heavy)
+**/embeds/
+**/embeddings/
+**/*_embeds/
+*.npy
+*.npz
+
+# Large data files (exclude large datasets)
+*.tar.gz
+*.zip
+*.7z
+*.rar
+
+# Ignore large CSV files in data subdirectories
+data/gsingh1-train/
+data/**/*.csv
+# But keep small test files
+!data/stub_*.csv
+!data/gpt4_100pairs.csv
+
+# Pytest
+.pytest_cache/
+.coverage
+htmlcov/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.bak
+*.log
+
+# Jupyter
+*.ipynb_checkpoints
+
+# Colab/Kaggle specific
+/content/
+/kaggle/

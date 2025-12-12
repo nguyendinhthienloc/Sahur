@@ -1,0 +1,22 @@
+# Metrics Configuration
+
+lexical_diversity:
+  mtld_threshold: 0.72
+
+perplexity:
+  models:
+    - gpt2
+  batch_size: 16
+
+embeddings:
+  model_name: all-MiniLM-L6-v2
+
+pos_entropy:
+  ngram_size: 2
+
+syntax:
+  depth_percentiles: [10, 50, 90]
+
+discourse:
+  markers_enabled: true
+
