@@ -316,21 +316,6 @@ Edit `config/metrics_config.yaml` to customize:
 
 
 
-## 🚀 Performance Tips
-
-### For Large Datasets (>10K documents)
-```bash
-```
-
-### For Small Datasets (<1K documents)
-```bash
-```
-
-### GPU Acceleration
-
-### Caching
-
-
 ## 📖 Citation
 
 If you use this pipeline in your research, please cite:
@@ -345,13 +330,6 @@ If you use this pipeline in your research, please cite:
 ```
 
 For IRAL lexical features, also cite the original IRAL paper.
-
-
-## 🔄 Migration from 15-Metric Pipeline
-
-The old 15-metric implementation is archived in `archive/old_15_metric_implementation/`. See [REFACTOR_NOTES.md](REFACTOR_NOTES.md) for migration guide.
-
-**Key changes:**
 
 
 ## 🐛 Troubleshooting

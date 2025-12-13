@@ -53,48 +53,30 @@ def create_violin_plot(df: pd.DataFrame,
     output_path : Path, optional
         Where to save the plot
     """
-    n_metrics = len(metrics)
-    n_cols = min(3, n_metrics)
-    n_rows = (n_metrics + n_cols - 1) // n_cols
-    
-    fig, axes = plt.subplots(n_rows, n_cols, figsize=(5 * n_cols, 4 * n_rows), dpi=150)
-    
-    if n_metrics == 1:
-        axes = [axes]
-    else:
-        axes = axes.flatten()
-    
-    for i, metric in enumerate(metrics):
-        ax = axes[i]
-        
-        # Create violin plot
-        sns.violinplot(data=df, x=group_col, y=metric, ax=ax,
-                      palette=['#E8E8E8', '#A0A0A0'], inner='box')
-        
-        ax.set_title(metric.replace('_', ' ').title(), fontsize=11, fontweight='bold')
+    # For each metric, create a separate violin plot with all 7 groups
+    import os
+    palette = sns.color_palette("colorblind", 7)
+    group_order = sorted(df[group_col].unique(), key=lambda x: (x != "Human_story", x))
+    label_map = {"Human_story": "Human", "gemma-2-9b": "Gemma-2.9B", "mistral-7B": "Mistral-7B", "qwen-2-72B": "Qwen-2-72B", "llama-8B": "Llama-8B", "accounts/yi-01-ai/models/yi-large": "Yi-Large", "GPT_4-o": "GPT-4o"}
+    for metric in metrics:
+        plt.figure(figsize=(10, 6), dpi=150)
+        ax = sns.violinplot(data=df, x=group_col, y=metric, order=group_order, palette=palette, inner="box")
+        ax.set_title(metric.replace('_', ' ').title(), fontsize=13, fontweight='bold')
         ax.set_xlabel('')
-        ax.set_ylabel(metric, fontsize=10)
-        
-        # Clean up spines
+        ax.set_ylabel(metric, fontsize=11)
+        ax.set_xticklabels([label_map.get(lbl.get_text(), lbl.get_text()) for lbl in ax.get_xticklabels()], rotation=35, ha="right", fontsize=11)
         ax.spines['top'].set_visible(False)
         ax.spines['right'].set_visible(False)
-        
-        # Grid
         ax.grid(axis='y', alpha=0.3, linestyle='-', linewidth=0.5)
         ax.set_axisbelow(True)
-    
-    # Hide unused subplots
-    for i in range(n_metrics, len(axes)):
-        axes[i].axis('off')
-    
-    plt.tight_layout()
-    
-    if output_path:
-        output_path.parent.mkdir(parents=True, exist_ok=True)
-        plt.savefig(output_path, dpi=300, bbox_inches='tight', facecolor='white')
-        logger.info(f"Saved violin plot to {output_path}")
-    
-    plt.close()
+        plt.tight_layout()
+        if output_path:
+            outdir = output_path.parent
+            outdir.mkdir(parents=True, exist_ok=True)
+            fname = outdir / f"violin_{metric}.png"
+            plt.savefig(fname, dpi=300, bbox_inches='tight', facecolor='white')
+            logger.info(f"Saved violin plot to {fname}")
+        plt.close()
 
 
 def create_radar_chart(df: pd.DataFrame,
@@ -116,6 +98,7 @@ def create_radar_chart(df: pd.DataFrame,
         Output path
     """
     # Normalize metrics to 0-1 scale for radar chart
+    import os
     df_norm = df.copy()
     for metric in metrics:
         min_val = df[metric].min()
@@ -124,49 +107,69 @@ def create_radar_chart(df: pd.DataFrame,
             df_norm[metric] = (df[metric] - min_val) / (max_val - min_val)
         else:
             df_norm[metric] = 0.5
-    
     # Compute mean per group
     group_means = df_norm.groupby(group_col)[metrics].mean()
-    
-    # Number of metrics
+    group_order = sorted(group_means.index, key=lambda x: (x != "Human_story", x))
+    label_map = {"Human_story": "Human", "gemma-2-9b": "Gemma-2.9B", "mistral-7B": "Mistral-7B", "qwen-2-72B": "Qwen-2-72B", "llama-8B": "Llama-8B", "accounts/yi-01-ai/models/yi-large": "Yi-Large", "GPT_4_o": "GPT-4o", "GPT_4-o": "GPT-4o"}
     num_vars = len(metrics)
-    
-    # Compute angle for each axis
     angles = np.linspace(0, 2 * np.pi, num_vars, endpoint=False).tolist()
-    angles += angles[:1]  # Complete the circle
-    
-    fig, ax = plt.subplots(figsize=(8, 8), subplot_kw=dict(projection='polar'), dpi=150)
-    
-    colors = ['#4472C4', '#ED7D31']
-    
-    for idx, (group_name, row) in enumerate(group_means.iterrows()):
-        values = row.tolist()
-        values += values[:1]  # Complete the circle
-        
-        ax.plot(angles, values, 'o-', linewidth=2, label=str(group_name), color=colors[idx % len(colors)])
-        ax.fill(angles, values, alpha=0.15, color=colors[idx % len(colors)])
-    
-    # Set labels
+    angles += angles[:1]
+    # Use 7 distinct color-blind-safe colors
+    import seaborn as sns
+    palette = sns.color_palette("colorblind", len(group_order))
+    fig, ax = plt.subplots(figsize=(8, 8), subplot_kw=dict(polar=True), dpi=150)
+    for idx, group_name in enumerate(group_order):
+        row = group_means.loc[group_name]
+        values = row.tolist() + [row.tolist()[0]]
+        label = label_map.get(group_name, group_name)
+        ax.plot(angles, values, 'o-', linewidth=2.5, label=label, color=palette[idx], zorder=10)
+        ax.fill(angles, values, color=palette[idx], alpha=0.18, zorder=10)
     ax.set_xticks(angles[:-1])
-    ax.set_xticklabels([m.replace('_', '\n') for m in metrics], fontsize=9)
-    
+    ax.set_xticklabels([m.replace('_', '\n') for m in metrics], fontsize=11)
     ax.set_ylim(0, 1)
     ax.set_yticks([0.25, 0.5, 0.75, 1.0])
-    ax.set_yticklabels(['0.25', '0.5', '0.75', '1.0'], fontsize=8)
-    
-    ax.legend(loc='upper right', bbox_to_anchor=(1.3, 1.1))
-    ax.set_title('Metric Profile Comparison', pad=20, fontsize=12, fontweight='bold')
-    
+    ax.set_yticklabels(['0.25', '0.5', '0.75', '1.0'], fontsize=9)
+    ax.legend(loc='upper right', bbox_to_anchor=(1.25, 1.1), fontsize=11, title="Model", title_fontsize=12)
+    ax.set_title('Metric Profile Comparison', pad=20, fontsize=13, fontweight='bold')
     ax.grid(True, linestyle='--', alpha=0.5)
-    
     plt.tight_layout()
-    
     if output_path:
         output_path.parent.mkdir(parents=True, exist_ok=True)
         plt.savefig(output_path, dpi=300, bbox_inches='tight', facecolor='white')
         logger.info(f"Saved radar chart to {output_path}")
-    
     plt.close()
+
+def create_heatmap(df: pd.DataFrame, metrics: list, group_col: str, output_path: Path = None) -> None:
+    """
+    Create a heatmap (models x metrics) for mean metric values (normalized 0-1).
+    """
+    import seaborn as sns
+    import matplotlib.pyplot as plt
+    label_map = {"Human_story": "Human", "gemma-2-9b": "Gemma-2.9B", "mistral-7B": "Mistral-7B", "qwen-2-72B": "Qwen-2-72B", "llama-8B": "Llama-8B", "accounts/yi-01-ai/models/yi-large": "Yi-Large", "GPT_4_o": "GPT-4o", "GPT_4-o": "GPT-4o"}
+    df_norm = df.copy()
+    for metric in metrics:
+        min_val = df[metric].min()
+        max_val = df[metric].max()
+        if max_val > min_val:
+            df_norm[metric] = (df[metric] - min_val) / (max_val - min_val)
+        else:
+            df_norm[metric] = 0.5
+    group_means = df_norm.groupby(group_col)[metrics].mean()
+    group_means.index = [label_map.get(idx, idx) for idx in group_means.index]
+    plt.figure(figsize=(10, 5), dpi=150)
+    sns.heatmap(group_means, annot=True, cmap="YlGnBu", cbar=True, linewidths=0.5, fmt=".2f", annot_kws={"fontsize":10})
+    plt.title("Normalized Metric Values by Model", fontsize=13, fontweight='bold')
+    plt.ylabel("Model")
+    plt.xlabel("Metric")
+    plt.tight_layout()
+    if output_path:
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        plt.savefig(output_path, dpi=300, bbox_inches='tight', facecolor='white')
+        logger.info(f"Saved heatmap to {output_path}")
+    plt.close()
+    # Optionally: create one radar per metric (not typical, but for completeness)
+    # for metric in metrics:
+    #     ...
 
 
 def create_keyword_barplot(keywords_df: pd.DataFrame,
@@ -260,16 +263,22 @@ def create_all_figures(df: pd.DataFrame,
     
     logger.info("Creating visualization figures")
     
-    # Violin plots
+    # Violin plots (one per metric)
     create_violin_plot(
         df, metrics, group_col,
-        output_path=figures_dir / 'violin_plots.png'
+        output_path=figures_dir / 'violin_dummy.png'  # dummy, real files are violin_{metric}.png
     )
-    
-    # Radar chart
+
+    # Radar chart (all 7 overlays, 7 colors)
     create_radar_chart(
         df, metrics, group_col,
         output_path=figures_dir / 'radar_chart.png'
+    )
+
+    # Heatmap (models x metrics)
+    create_heatmap(
+        df, metrics, group_col,
+        output_path=figures_dir / 'heatmap.png'
     )
     
     # Lexical plots if available

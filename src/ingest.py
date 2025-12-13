@@ -153,16 +153,38 @@ def load_data(path: Path,
     
     logger.info(f"Using columns - text: {text_col}, label: {label_col}, topic: {topic_col}")
     
-    # Standardize column names
-    df = df.rename(columns={text_col: 'text'})
-    if label_col and label_col in df.columns:
-        df = df.rename(columns={label_col: 'label'})
-    if topic_col and topic_col in df.columns:
-        df = df.rename(columns={topic_col: 'topic'})
-    
-    # Drop rows with missing or empty text BEFORE cleaning
+
+    # If label_col is not provided, and the dataset is wide (multiple text columns for different corpora), automatically melt to long format
+    if label_col is None:
+        non_text_cols = {'prompt', 'topic', 'subject', 'domain', 'category'}
+        text_candidates = [col for col in df.columns if col not in non_text_cols]
+        if len(text_candidates) > 1:
+            logger.info(f"Detected wide-format dataset with columns: {text_candidates}. Melting to long format.")
+            id_vars = [col for col in df.columns if col not in text_candidates]
+            # Use a temporary value_name to avoid collision
+            df_long = df.melt(id_vars=id_vars, value_vars=text_candidates, var_name='label', value_name='text_value')
+            df_long = df_long.dropna(subset=['text_value'])
+            df_long = df_long[df_long['text_value'].astype(str).str.strip() != '']
+            df_long = df_long.reset_index(drop=True)
+            if 'topic' in df_long.columns:
+                df_long['topic'] = df_long['topic'].fillna('SOCIETY')
+            else:
+                logger.warning("No topic column found. Assigning default topic: SOCIETY for all documents")
+                df_long['topic'] = 'SOCIETY'
+            # Now rename text_value to text
+            df_long = df_long.rename(columns={'text_value': 'text'})
+            df = df_long
+            label_col = 'label'
+            text_col = 'text'
+        else:
+            # Standardize column names if not melting
+            df = df.rename(columns={text_col: 'text'})
+    else:
+        # Standardize column names if label_col is provided
+        df = df.rename(columns={text_col: 'text'})
+    # Always set initial_len after all conditional logic
     initial_len = len(df)
-    # Drop NaN/None values first
+
     df = df.dropna(subset=['text'])
     # Drop empty strings
     df = df[df['text'].astype(str).str.strip() != '']
