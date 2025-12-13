@@ -253,7 +253,7 @@ def create_all_figures(df: pd.DataFrame,
     output_dir : Path
         Output directory
     lexical_outputs : dict, optional
-        Optional lexical outputs from irral_lexical module
+        Optional lexical outputs from iral_lexical module
     """
     figures_dir = output_dir / 'figures'
     figures_dir.mkdir(parents=True, exist_ok=True)

@@ -17,7 +17,7 @@ from .ingest import load_data
 from .pipeline import run_pipeline
 from .stats_analysis import compare_groups, export_statistical_tests
 from .visualize import create_all_figures
-from .irral_lexical import compute_irral_outputs
+from .iral import compute_iral_outputs
 from .metrics_core import CORE_METRIC_NAMES
 
 logger = setup_logger(__name__)
@@ -50,10 +50,6 @@ def cli():
               help='Batch size for parsing')
 @click.option('--enable-embeddings/--no-embeddings', default=False,
               help='Enable sentence embeddings for s2s_cosine metric')
-@click.option('--enable-irral-lexical/--no-irral-lexical', default=False,
-              help='Enable IRAL lexical explainability (log-odds, collocations)')
-@click.option('--auto-topic/--no-auto-topic', default=True,
-              help='Automatically classify topics using zero-shot model if no topic column exists')
 @click.option('--cache-dir', default=None, type=click.Path(),
               help='Cache directory for parsed docs (default: output_dir/cache)')
 @click.option('--dry-run', is_flag=True,
@@ -61,8 +57,8 @@ def cli():
 @click.option('--debug', is_flag=True,
               help='Enable debug logging')
 def run(input_path, output_dir, text_col, label_col, topic_col, max_rows,
-        shards, workers, batch_size, enable_embeddings, enable_irral_lexical,
-        auto_topic, cache_dir, dry_run, debug):
+    shards, workers, batch_size, enable_embeddings,
+    cache_dir, dry_run, debug):
     """
     Run the complete pipeline: parse, extract features, analyze, and visualize.
     """
@@ -96,8 +92,8 @@ def run(input_path, output_dir, text_col, label_col, topic_col, max_rows,
     logger.info(f"Input: {input_path}")
     logger.info(f"Output: {output_dir}")
     logger.info(f"Shards: {shards}, Workers: {workers}, Batch size: {batch_size}")
-    logger.info(f"Embeddings: {enable_embeddings}, IRAL Lexical: {enable_irral_lexical}")
-    logger.info(f"Auto Topic: {auto_topic}")
+    logger.info(f"Embeddings: {enable_embeddings}")
+    # Auto topic option removed — topics should be present in the dataset
     
     if dry_run:
         logger.info("DRY RUN - No changes will be made")
@@ -112,7 +108,6 @@ def run(input_path, output_dir, text_col, label_col, topic_col, max_rows,
         topic_col=topic_col,
         max_rows=max_rows,
         clean=True,
-        auto_topic=auto_topic,
         cache_dir=cache_dir
     )
     
@@ -151,23 +146,8 @@ def run(input_path, output_dir, text_col, label_col, topic_col, max_rows,
         logger.warning("No 'label' column found, skipping statistical comparison")
         stats_results = None
     
-    # Step 4: IRAL lexical explainability (optional)
+    # Step 4: IRAL lexical explainability removed from main pipeline
     lexical_outputs = None
-    if enable_irral_lexical:
-        logger.info("\n[4/5] Computing IRAL lexical explainability...")
-        
-        if 'label' in features_df.columns:
-            lexical_outputs = compute_irral_outputs(
-                df=features_df,
-                group_col='label',
-                text_col='text',
-                output_dir=output_dir / 'lexical'
-            )
-            logger.info(f"Lexical outputs saved to {output_dir / 'lexical'}")
-        else:
-            logger.warning("No 'label' column, skipping lexical analysis")
-    else:
-        logger.info("\n[4/5] IRAL lexical explainability disabled (use --enable-irral-lexical to enable)")
     
     # Step 5: Visualization
     logger.info("\n[5/5] Creating visualizations...")
@@ -209,9 +189,7 @@ def run(input_path, output_dir, text_col, label_col, topic_col, max_rows,
               help='Path to features parquet/csv file')
 @click.option('--output', '-o', 'output_dir', required=True, type=click.Path(),
               help='Output directory for analysis results')
-@click.option('--enable-irral-lexical/--no-irral-lexical', default=False,
-              help='Enable IRAL lexical explainability')
-def analyze(input_path, output_dir, enable_irral_lexical):
+def analyze(input_path, output_dir):
     """
     Analyze pre-computed features (skip parsing and extraction).
     """
@@ -245,17 +223,8 @@ def analyze(input_path, output_dir, enable_irral_lexical):
         export_statistical_tests(stats_results, stats_dir / 'statistical_tests.csv')
         logger.info(f"Statistical tests saved to {stats_dir / 'statistical_tests.csv'}")
     
-    # IRAL lexical
-    if enable_irral_lexical and 'label' in df.columns and 'text' in df.columns:
-        logger.info("Computing IRAL lexical explainability...")
-        lexical_outputs = compute_irral_outputs(
-            df=df,
-            group_col='label',
-            text_col='text',
-            output_dir=output_dir / 'lexical'
-        )
-    else:
-        lexical_outputs = None
+    # IRAL lexical analysis moved to separate module/package (src/iral)
+    lexical_outputs = None
     
     # Visualizations
     if 'label' in df.columns:

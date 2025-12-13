@@ -170,8 +170,8 @@ def main():
     print("2. Run statistical tests:")
     print("   python run_stats_tests.py results/test_run")
     print()
-    print("3. Generate IRAL-style plots:")
-    print("   python generate_iral_plots.py results/test_run")
+    print("3. Generate plots (optional):")
+    print("   Plots are not produced by a repository helper. Use CSVs in results/<run>/lexical/ to create figures.")
     print()
     
     return True

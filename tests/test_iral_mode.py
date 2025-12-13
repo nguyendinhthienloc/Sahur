@@ -7,13 +7,13 @@ Tests Log-Odds, collocations, and frequency extraction.
 import pytest
 import pandas as pd
 import numpy as np
-from src.irral_lexical import (
+from src.iral import (
     compute_log_odds,
     extract_token_counts,
     compute_group_log_odds,
     extract_bigram_collocations,
     compute_top_k_frequencies,
-    compute_irral_outputs
+    compute_iral_outputs
 )
 
 
@@ -101,12 +101,12 @@ class TestGroupLogOdds:
         assert 'log_odds' in df.columns
 
 
-class TestComputeIrralOutputs:
+class TestComputeIralOutputs:
     """Test full IRAL output computation."""
     
     def test_compute_full_outputs(self, sample_df, tmp_path):
         """Test computing all IRAL outputs."""
-        outputs = compute_irral_outputs(
+        outputs = compute_iral_outputs(
             df=sample_df,
             group_col='label',
             text_col='text',

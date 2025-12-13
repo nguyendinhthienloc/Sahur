@@ -26,7 +26,6 @@ This project provides a clean, maintainable implementation of six core linguisti
 
 **Why these 6?** Each metric captures a distinct linguistic dimension with proven discriminative power, low redundancy, and computational efficiency.
 
----
 
 ## 📦 Installation
 
@@ -48,12 +47,6 @@ python -m spacy download en_core_web_lg
 ```
 
 ### Core Dependencies
-- `spacy>=3.0` - NLP pipeline
-- `lexicalrichness>=0.5.0` - MTLD computation
-- `sentence-transformers>=2.2.0` - Embeddings (optional)
-- `pandas`, `numpy`, `scipy` - Data processing
-- `matplotlib`, `seaborn` - Visualization
-- `click` - CLI interface
 
 ### 🌐 Cloud Environments (Colab/Kaggle)
 
@@ -68,7 +61,6 @@ For running on Google Colab or Kaggle notebooks:
 
 📖 **See [CLOUD_SETUP.md](CLOUD_SETUP.md) for complete cloud setup guide**
 
----
 
 ## ⚡ Quick Start & Complete Workflow
 
@@ -103,11 +95,7 @@ python -m src.cli run \
 ```
 
 **Outputs:**
-- `all_features.parquet` - All extracted features
-- `all_features.csv` - Human-readable version
-- `cache/` - Cached parsed documents (reusable)
 
----
 
 ### Step 2: Run Statistical Tests
 
@@ -127,28 +115,14 @@ python -m src.cli analyze \
 ```
 
 **Outputs:**
-- `tables/statistical_tests.csv` - Welch t-test, Mann-Whitney U, Cohen's d, p-values
 
----
 
-### Step 3: Generate IRAL-Style Plots
+### Step 3: (Optional) Plots
 
-⚠️ **Plots are NOT automatic** - use the helper script:
+Plots are no longer produced by the repository helper script. Use the CSV outputs in the `lexical/` folder to create figures locally with your preferred plotting tools.
 
-```bash
-python generate_iral_plots.py <PATH_TO_OUTPUT_DIRECTORY>
-```
+Example: load `results/.../lexical/log_odds.csv` or `collocations_group_*.csv` into a notebook and generate visuals as needed.
 
-**Example:**
-```bash
-python generate_iral_plots.py results/baseline_run
-```
-
-**Outputs:**
-- `figures/violin_plots.png` - Metric distributions
-- `figures/radar_chart.png` - Metric profiles
-
----
 
 ### Step 4: IRAL Lexical Analysis (Optional)
 
@@ -158,7 +132,7 @@ For keyword extraction and log-odds analysis:
 python -m src.cli analyze \
   --input <PATH_TO_OUTPUT_DIRECTORY>/all_features.parquet \
   --output <PATH_TO_OUTPUT_DIRECTORY> \
-  --enable-irral-lexical
+  --enable-iral-lexical
 ```
 
 **Example:**
@@ -166,15 +140,11 @@ python -m src.cli analyze \
 python -m src.cli analyze \
   --input results/baseline_run/all_features.parquet \
   --output results/baseline_run \
-  --enable-irral-lexical
+  --enable-iral-lexical
 ```
 
 **Outputs:**
-- `lexical/log_odds.csv` - Keywords ranked by log-odds
-- `lexical/collocations_*.csv` - Bigram collocations
-- `figures/keywords_*.png` - Keyword visualizations
 
----
 
 ### Complete Example Workflow
 
@@ -191,10 +161,10 @@ python -m src.cli run \
 python -m src.cli analyze \
   --input results/full_analysis/all_features.parquet \
   --output results/full_analysis \
-  --enable-irral-lexical
+  --enable-iral-lexical
 
-# 3. Generate plots
-python generate_iral_plots.py results/full_analysis
+# 3. Generate plots (Manual)
+# Use CSVs under `results/full_analysis/lexical/` to build figures locally.
 
 # 4. View results
 ls results/full_analysis/tables/
@@ -202,7 +172,6 @@ ls results/full_analysis/figures/
 ls results/full_analysis/lexical/
 ```
 
----
 
 ### Quick Test Run
 
@@ -216,7 +185,6 @@ python -m src.cli run \
   --shards 1
 ```
 
----
 
 ## 🔧 Command-Line Options
 
@@ -234,7 +202,7 @@ python -m src.cli run \
 | `--workers` | spaCy parallel workers | 1 |
 | `--batch-size` | Parsing batch size | 32 |
 | `--enable-embeddings` | Enable sentence embeddings | off |
-| `--enable-irral-lexical` | Enable lexical analysis | off |
+| `--enable-iral-lexical` | Enable lexical analysis | off |
 | `--cache-dir` | Cache directory | `{output}/cache` |
 | `--dry-run` | Preview without executing | off |
 | `--debug` | Debug logging | off |
@@ -247,10 +215,9 @@ Analyze pre-computed features without re-parsing:
 python -m src.cli analyze \
   --input results/baseline_run/all_features.parquet \
   --output results/reanalysis \
-  --enable-irral-lexical
+  --enable-iral-lexical
 ```
 
----
 
 ## 📊 Output Structure
 
@@ -266,14 +233,13 @@ results/
 ├── figures/
 │   ├── violin_plots.png       # Metric distributions
 │   ├── radar_chart.png        # Metric profiles
-│   └── keywords_*.png         # (if --enable-irral-lexical)
-└── lexical/                   # (if --enable-irral-lexical)
+│   └── keywords_*.png         # (if --enable-iral-lexical)
+└── lexical/                   # (if --enable-iral-lexical)
     ├── log_odds.csv
     ├── collocations_group_*.csv
     └── top_freq_group_*.csv
 ```
 
----
 
 ## 🧪 Testing
 
@@ -305,15 +271,10 @@ ls results/integration_test/tables/statistical_tests.csv
 ls results/integration_test/figures/
 ```
 
----
 
 ## 📚 Documentation
 
-- **[REFACTOR_NOTES.md](REFACTOR_NOTES.md)** - Detailed refactoring documentation, usage examples, performance notes
-- **[METRICS_REFERENCE.md](METRICS_REFERENCE.md)** - Metric definitions and formulas
-- **[config/metrics_config.yaml](config/metrics_config.yaml)** - Pipeline configuration
 
----
 
 ## 🏗️ Architecture
 
@@ -325,82 +286,50 @@ The pipeline consists of 10 modular Python files in `src/`:
 4. **`metrics_core.py`** - Six core metric implementations
 5. **`embeddings.py`** - Sentence embedding wrapper
 6. **`stats_analysis.py`** - Statistical testing
-7. **`irral_lexical.py`** - Optional lexical explainability
+7. **`iral_lexical.py`** - Optional lexical explainability
 8. **`visualize.py`** - IRAL-style plotting
 9. **`pipeline.py`** - Orchestration and shard processing
 10. **`utils.py`** - Shared utilities
 
 **Design principles:**
-- Single responsibility per module
-- Type hints and docstrings
-- Deterministic outputs
-- Robust error handling
 
----
 
 ## 🔬 Statistical Analysis
 
 The pipeline automatically computes:
 
-- **Descriptive statistics** (mean, std, n per group)
-- **Welch's t-test** (unequal variances)
-- **Mann-Whitney U test** (non-parametric)
-- **Cohen's d** (effect size with pooled std)
-- **Levene's test** (variance homogeneity)
-- **Multiple testing corrections** (Holm-Bonferroni, Benjamini-Hochberg FDR)
 
 All results exported to `tables/statistical_tests.csv`.
 
----
 
 ## 🎨 Visualization
 
 IRAL journal-style figures (serif fonts, grayscale, 300 DPI):
 
-- **Violin plots** - Metric distributions by group
-- **Radar chart** - Metric profile comparison
-- **Keyword plots** - Log-odds ranked tokens (if --enable-irral-lexical)
 
 Figures saved to `{output}/figures/` in PNG format.
 
----
 
 ## ⚙️ Configuration
 
 Edit `config/metrics_config.yaml` to customize:
 
-- Core metric list
-- Processing parameters (batch size, workers)
-- spaCy model selection
-- Embedding model
-- Statistical test settings
-- Visualization style
-- Output formats
 
----
 
 ## 🚀 Performance Tips
 
 ### For Large Datasets (>10K documents)
 ```bash
---shards 8 --workers 2 --batch-size 64 --enable-embeddings
 ```
 
 ### For Small Datasets (<1K documents)
 ```bash
---shards 1 --workers 1 --batch-size 32
 ```
 
 ### GPU Acceleration
-- Install CUDA-compatible PyTorch for faster embeddings
-- Sentence-transformers will auto-detect GPU
 
 ### Caching
-- First run: slow (parses all documents)
-- Second run: 10-20x faster (uses cache)
-- Clear cache: `rm -rf results/cache/`
 
----
 
 ## 📖 Citation
 
@@ -417,20 +346,13 @@ If you use this pipeline in your research, please cite:
 
 For IRAL lexical features, also cite the original IRAL paper.
 
----
 
 ## 🔄 Migration from 15-Metric Pipeline
 
 The old 15-metric implementation is archived in `archive/old_15_metric_implementation/`. See [REFACTOR_NOTES.md](REFACTOR_NOTES.md) for migration guide.
 
 **Key changes:**
-- Reduced from 15 to 6 focused metrics
-- Added IRAL lexical explainability (optional)
-- Improved statistical testing
-- Cleaner modular architecture
-- Better caching and performance
 
----
 
 ## 🐛 Troubleshooting
 
@@ -447,28 +369,23 @@ pip install sentence-transformers
 ### "No text column found"
 Specify column explicitly:
 ```bash
---text-col your_column_name
 ```
 
 ### Slow parsing
 Increase batch size and workers:
 ```bash
---batch-size 64 --workers 4
 ```
 
 ### Out of memory
 Reduce batch size or use more shards:
 ```bash
---batch-size 16 --shards 16
 ```
 
----
 
 ## 📝 License
 
 MIT License
 
----
 
 ## 🤝 Contributing
 
@@ -478,12 +395,10 @@ Contributions welcome! Please:
 3. Add tests for new features
 4. Submit a pull request
 
----
 
 ## 📞 Contact
 
 For questions or issues, please open a GitHub issue.
 
----
 
 **Built with ❤️ for linguistic analysis and human vs AI text classification research.**

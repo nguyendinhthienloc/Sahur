@@ -20,7 +20,7 @@ from .ingest import load_data, create_shards
 from .parse_and_cache import parse_documents, get_spacy_pipeline
 from .stats_analysis import compare_groups, export_statistical_tests
 from .visualize import create_all_figures
-from .irral_lexical import compute_irral_outputs
+from .iral import compute_iral_outputs
 
 __version__ = "1.0.0"
 __all__ = [
@@ -30,6 +30,6 @@ __all__ = [
     'parse_documents',
     'compare_groups',
     'create_all_figures',
-    'compute_irral_outputs',
+    'compute_iral_outputs',
     'CORE_METRIC_NAMES'
 ]

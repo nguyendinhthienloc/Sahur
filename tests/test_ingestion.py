@@ -10,29 +10,11 @@ import shutil
 
 from src.ingest import (
     load_data, 
-    create_shards, 
-    assign_topic,
-    TOPIC_LABELS
+    create_shards
 )
 
 
-def test_topic_labels_defined():
-    """Test that topic labels are properly defined."""
-    assert len(TOPIC_LABELS) == 8
-    expected_topics = [
-        "EDUCATION", "TECHNOLOGY", "ENVIRONMENT", "HEALTH",
-        "SOCIETY", "ECONOMY", "POLITICS", "CULTURE"
-    ]
-    assert set(TOPIC_LABELS) == set(expected_topics)
-
-
-def test_assign_topic_fallback():
-    """Test that very short texts get fallback topic."""
-    result = assign_topic("Hi", classifier=None)
-    assert result == "SOCIETY"
-    
-    result = assign_topic("", classifier=None)
-    assert result == "SOCIETY"
+# Zero-shot topic helpers removed; ingestion now requires topic column or fills default
 
 
 def test_load_data_basic(tmp_path):
@@ -45,8 +27,7 @@ def test_load_data_basic(tmp_path):
     })
     df.to_csv(csv_path, index=False)
     
-    # Load without auto topic (faster for testing)
-    result = load_data(csv_path, auto_topic=False)
+    result = load_data(csv_path)
     
     assert len(result) == 2
     assert 'text' in result.columns
@@ -66,7 +47,7 @@ def test_load_data_with_existing_topic(tmp_path):
     })
     df.to_csv(csv_path, index=False)
     
-    result = load_data(csv_path, auto_topic=False)
+    result = load_data(csv_path)
     
     assert len(result) == 2
     assert 'topic' in result.columns
@@ -82,7 +63,7 @@ def test_load_data_max_rows(tmp_path):
     })
     df.to_csv(csv_path, index=False)
     
-    result = load_data(csv_path, max_rows=10, auto_topic=False)
+    result = load_data(csv_path, max_rows=10)
     
     assert len(result) == 10
 
@@ -152,7 +133,7 @@ def test_load_data_empty_text_removal(tmp_path):
     df = pd.concat([df, empty_df], ignore_index=True)
     df.to_csv(csv_path, index=False)
     
-    result = load_data(csv_path, auto_topic=False)
+    result = load_data(csv_path)
     
     # Should only keep texts with actual content (3 valid ones)
     assert len(result) == 3
@@ -174,7 +155,7 @@ def test_load_data_column_detection(tmp_path):
     })
     df.to_csv(csv_path, index=False)
     
-    result = load_data(csv_path, auto_topic=False)
+    result = load_data(csv_path)
     
     assert 'text' in result.columns
     assert 'label' in result.columns

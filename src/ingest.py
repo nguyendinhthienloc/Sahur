@@ -6,7 +6,6 @@ Handles:
 - Column normalization (auto-detect common names)
 - Minimal text cleaning (unicode normalize, strip HTML)
 - Shard creation for parallel processing
-- Auto topic classification (zero-shot)
 """
 
 import pandas as pd
@@ -16,23 +15,12 @@ import json
 from typing import Optional, List, Tuple
 from pathlib import Path
 import logging
-from transformers import pipeline
+# Note: zero-shot auto-classification removed — dataset is expected to include `topic`.
 
 from .utils import setup_logger
 
 logger = setup_logger(__name__)
 
-# Hardcoded topic list for zero-shot classification
-TOPIC_LABELS = [
-    "EDUCATION",
-    "TECHNOLOGY",
-    "ENVIRONMENT",
-    "HEALTH",
-    "SOCIETY",
-    "ECONOMY",
-    "POLITICS",
-    "CULTURE"
-]
 
 
 def normalize_unicode(text: str) -> str:
@@ -50,43 +38,7 @@ def normalize_unicode(text: str) -> str:
     return text
 
 
-def assign_topic(text: str, classifier=None) -> str:
-    """
-    Assign a topic to text using zero-shot classification.
-    
-    Parameters
-    ----------
-    text : str
-        Text to classify
-    classifier : transformers.Pipeline, optional
-        Pre-loaded zero-shot classifier (to avoid reloading)
-        
-    Returns
-    -------
-    str
-        One of the 8 hardcoded topics, or "SOCIETY" as fallback
-    """
-    if not text or not isinstance(text, str) or len(text.strip()) < 10:
-        logger.warning(f"Very short text for topic classification, using fallback: SOCIETY")
-        return "SOCIETY"
-    
-    try:
-        # Truncate long texts to first 512 characters for speed
-        text_truncated = text[:512]
-        
-        result = classifier(text_truncated, TOPIC_LABELS)
-        
-        # Get highest scoring label
-        if result and 'labels' in result and len(result['labels']) > 0:
-            topic = result['labels'][0]
-            return topic
-        else:
-            logger.warning("Zero-shot classification returned no labels, using fallback: SOCIETY")
-            return "SOCIETY"
-            
-    except Exception as e:
-        logger.warning(f"Topic classification failed: {e}, using fallback: SOCIETY")
-        return "SOCIETY"
+# zero-shot helper removed — topic assignment now relies on existing `topic` column
 
 
 def strip_html(text: str) -> str:
@@ -152,7 +104,6 @@ def load_data(path: Path,
               topic_col: Optional[str] = None,
               max_rows: Optional[int] = None,
               clean: bool = True,
-              auto_topic: bool = True,
               cache_dir: Optional[Path] = None) -> pd.DataFrame:
     """
     Load and prepare dataset.
@@ -171,10 +122,8 @@ def load_data(path: Path,
         Maximum rows to load (for testing)
     clean : bool, default=True
         Apply minimal cleaning to text
-    auto_topic : bool, default=True
-        Automatically classify topics using zero-shot if no topic column exists
     cache_dir : Path, optional
-        Directory to cache topic predictions
+        (Unused) Directory placeholder for compatibility
         
     Returns
     -------
@@ -234,58 +183,9 @@ def load_data(path: Path,
     if 'doc_id' not in df.columns:
         df['doc_id'] = [f"doc_{i:06d}" for i in range(len(df))]
     
-    # Auto topic classification if needed
-    if auto_topic and 'topic' not in df.columns:
-        logger.info("No topic column found. Auto-classifying topics using zero-shot model...")
-        
-        # Setup cache directory
-        if cache_dir is None:
-            cache_dir = Path.cwd() / 'cache' / 'topics'
-        else:
-            cache_dir = Path(cache_dir) / 'topics'
-        cache_dir.mkdir(parents=True, exist_ok=True)
-        
-        try:
-            # Load zero-shot classifier
-            logger.info("Loading facebook/bart-large-mnli for topic classification...")
-            classifier = pipeline("zero-shot-classification", 
-                                model="facebook/bart-large-mnli",
-                                device=-1)  # CPU
-            
-            topics = []
-            for idx, row in df.iterrows():
-                doc_id = row['doc_id']
-                text = row['text']
-                
-                # Check cache
-                cache_file = cache_dir / f"{doc_id}.json"
-                if cache_file.exists():
-                    with open(cache_file, 'r') as f:
-                        cached = json.load(f)
-                        topics.append(cached['topic'])
-                else:
-                    # Classify
-                    topic = assign_topic(text, classifier)
-                    topics.append(topic)
-                    
-                    # Save to cache
-                    with open(cache_file, 'w') as f:
-                        json.dump({'topic': topic}, f)
-                
-                # Log progress
-                if (idx + 1) % 100 == 0:
-                    logger.info(f"Classified {idx + 1}/{len(df)} documents")
-            
-            df['topic'] = topics
-            logger.info(f"Topic classification complete. Distribution: {df['topic'].value_counts().to_dict()}")
-            
-        except Exception as e:
-            logger.error(f"Auto topic classification failed: {e}")
-            logger.warning("Falling back to default topic: SOCIETY for all documents")
-            df['topic'] = "SOCIETY"
-    
-    elif 'topic' not in df.columns:
-        logger.warning("No topic column and auto_topic=False. Adding default topic: SOCIETY")
+    # Ensure topic column exists; if missing, fill with default
+    if 'topic' not in df.columns:
+        logger.warning("No topic column found. Assigning default topic: SOCIETY for all documents")
         df['topic'] = "SOCIETY"
     else:
         logger.info(f"Using existing topic column. Distribution: {df['topic'].value_counts().to_dict()}")

@@ -33,8 +33,8 @@ embeddings:
   cache_enabled: true
 
 # IRAL lexical explainability (optional)
-irral_lexical:
-  enabled: false              # Disabled by default (use --enable-irral-lexical)
+iral_lexical:
+  enabled: false              # Disabled by default (use --enable-iral-lexical)
   min_count: 5                # Minimum token frequency
   top_k: 100                  # Number of top items to extract
   
