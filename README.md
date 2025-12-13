@@ -1,3 +1,22 @@
+## Running the Pipeline (Terminal Instructions)
+
+To run the main pipeline, statistical tests (1-vs-N), and IRAL lexical analysis on a dataset, use:
+
+```
+python -m src.cli run --input data/cleaned_by_topic/environment.csv --output results/environment_allcorpora_test --max-rows 10 --enable-embeddings --shards 2 --workers 2
+```
+
+- This will process the first 10 rows of environment.csv, extract features, run 1-vs-N statistical tests (Human vs all models), and run IRAL lexical analysis (frequencies, collocations, log-odds) for all corpora.
+- Results will be saved in the specified output folder (e.g., `results/environment_allcorpora_test`).
+- Figures, statistical tables, and IRAL outputs will be in subfolders.
+
+**Requirements:** Activate your virtual environment and ensure all dependencies are installed before running.
+
+```
+.\.venv\Scripts\activate
+```
+
+Then run the pipeline command above.
 # Human vs AI Text Classification: 6-Metric Linguistic Baseline
 
 **Publication-ready linguistic feature extraction pipeline for distinguishing human and AI-generated text.**

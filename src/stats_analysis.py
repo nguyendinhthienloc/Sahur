@@ -1,3 +1,56 @@
+import pandas as pd
+def compare_one_vs_many(
+    df: pd.DataFrame,
+    metrics: list,
+    group_col: str,
+    reference_group: str
+) -> pd.DataFrame:
+    """
+    Compare one reference group (e.g., Human) vs each other group (e.g., models) for each metric.
+    Returns a DataFrame with all results and multiple-testing correction.
+    """
+    import numpy as np
+    results = []
+    cmp_groups = [g for g in df[group_col].unique() if g != reference_group]
+    for metric in metrics:
+        if metric not in df.columns:
+            continue
+        ref_vals = df[df[group_col] == reference_group][metric].values
+        ref_vals = ref_vals[~np.isnan(ref_vals)]
+        for cmp_group in cmp_groups:
+            cmp_vals = df[df[group_col] == cmp_group][metric].values
+            cmp_vals = cmp_vals[~np.isnan(cmp_vals)]
+            if len(ref_vals) < 2 or len(cmp_vals) < 2:
+                continue
+            ref_mean = np.mean(ref_vals)
+            cmp_mean = np.mean(cmp_vals)
+            mean_diff = ref_mean - cmp_mean
+            t_stat, t_pval = welch_ttest(ref_vals, cmp_vals)
+            u_stat, u_pval = mann_whitney_u(ref_vals, cmp_vals)
+            d = cohen_d(ref_vals, cmp_vals)
+            results.append({
+                'metric': metric,
+                'reference': reference_group,
+                'comparison': cmp_group,
+                'ref_mean': ref_mean,
+                'cmp_mean': cmp_mean,
+                'mean_diff': mean_diff,
+                't_stat': t_stat,
+                't_pvalue': t_pval,
+                'u_stat': u_stat,
+                'u_pvalue': u_pval,
+                'cohens_d': d,
+                'n_ref': len(ref_vals),
+                'n_cmp': len(cmp_vals)
+            })
+    results_df = pd.DataFrame(results)
+    # Multiple testing correction across all comparisons
+    if len(results_df) > 0:
+        results_df['t_p_holm'] = holm_bonferroni(results_df['t_pvalue'].tolist())
+        results_df['t_p_fdr'] = benjamini_hochberg(results_df['t_pvalue'].tolist())
+        results_df['u_p_holm'] = holm_bonferroni(results_df['u_pvalue'].tolist())
+        results_df['u_p_fdr'] = benjamini_hochberg(results_df['u_pvalue'].tolist())
+    return results_df
 """
 Statistical analysis module adapted from IRAL replication.
 

@@ -132,12 +132,13 @@ def run(input_path, output_dir, text_col, label_col, topic_col, max_rows,
     logger.info("\n[3/5] Performing statistical analysis...")
     
     if 'label' in features_df.columns:
-        stats_results = compare_groups(
+        from src.stats_analysis import compare_one_vs_many
+        stats_results = compare_one_vs_many(
             df=features_df,
             metrics=CORE_METRIC_NAMES,
-            group_col='label'
+            group_col='label',
+            reference_group='Human_story'
         )
-        
         # Export statistics
         stats_dir = output_dir / 'tables'
         export_statistical_tests(stats_results, stats_dir / 'statistical_tests.csv')
@@ -146,7 +147,10 @@ def run(input_path, output_dir, text_col, label_col, topic_col, max_rows,
         logger.warning("No 'label' column found, skipping statistical comparison")
         stats_results = None
     
-    # Step 4: IRAL lexical explainability removed from main pipeline
+    # Step 4: IRAL lexical analysis (multi-corpus, 1-vs-N)
+    from src.iral.iral_cli import run_iral_cli
+    logger.info("\n[4/5] Running IRAL lexical analysis (multi-corpus 1-vs-N)...")
+    run_iral_cli(features_df, output_dir, group_col='label', text_col='text', reference_group='Human_story')
     lexical_outputs = None
     
     # Step 5: Visualization

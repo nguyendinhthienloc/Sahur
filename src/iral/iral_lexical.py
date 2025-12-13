@@ -98,9 +98,8 @@ def compute_top_k_frequencies(texts: List[str], k: int = 100) -> pd.DataFrame:
 def compute_iral_outputs(df: pd.DataFrame, group_col: str = 'label', text_col: str = 'text', output_dir: Path = None, min_count: int = 5, top_k: int = 100):
     logger.info("Computing IRAL lexical explainability outputs")
     groups = df[group_col].unique()
-    if len(groups) < 2:
-        logger.warning("Need at least 2 groups for log-odds comparison")
-        return {}
+    if len(groups) != 2:
+        raise ValueError(f"compute_iral_outputs is only safe for exactly 2 groups (legacy 1v1 IRAL). Got {len(groups)}: {groups}. Use the orchestrator for multi-corpus analysis.")
     a, b = groups[0], groups[1]
     a_texts = df[df[group_col]==a][text_col].tolist()
     b_texts = df[df[group_col]==b][text_col].tolist()

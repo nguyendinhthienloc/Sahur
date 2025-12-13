@@ -1,3 +1,4 @@
+from wordcloud import WordCloud
 """
 IRAL-specific visualization module for creating publication figures.
 Generates 3 figures matching Zhang (2024) IRAL article style.
@@ -223,6 +224,20 @@ def create_three_iral_figures(keywords_group_0, keywords_group_1, outdir,
         group_0_name,
         top_n=40
     )
+
+    # Figure 4: Word cloud for human group
+    if keywords_group_0:
+        word_freq = {w: abs(float(s)) for w, s in keywords_group_0}
+        wc = WordCloud(width=800, height=400, background_color='white', colormap='tab20', prefer_horizontal=1.0)
+        wc.generate_from_frequencies(word_freq)
+        plt.figure(figsize=(8, 4), dpi=300)
+        plt.imshow(wc, interpolation='bilinear')
+        plt.axis('off')
+        plt.title(f"Figure 4: Word Cloud ({group_0_name})", fontsize=12, fontweight='bold', loc='left')
+        wc_path = os.path.join(outdir, "figure_4_wordcloud_human.png")
+        plt.savefig(wc_path, dpi=300, bbox_inches='tight', facecolor='white', edgecolor='none')
+        plt.close()
+        print(f"✓ Created Figure 4: {wc_path}")
     
     # Figure 3: AI corpus keywords (positive log-odds = AI-specific)
     keywords_1_path = os.path.join(outdir, "figure_3_keywords_ai.png")
@@ -233,6 +248,20 @@ def create_three_iral_figures(keywords_group_0, keywords_group_1, outdir,
         group_1_name,
         top_n=40
     )
+
+    # Figure 5: Word cloud for AI group
+    if keywords_group_1:
+        word_freq = {w: abs(float(s)) for w, s in keywords_group_1}
+        wc = WordCloud(width=800, height=400, background_color='white', colormap='tab20', prefer_horizontal=1.0)
+        wc.generate_from_frequencies(word_freq)
+        plt.figure(figsize=(8, 4), dpi=300)
+        plt.imshow(wc, interpolation='bilinear')
+        plt.axis('off')
+        plt.title(f"Figure 5: Word Cloud ({group_1_name})", fontsize=12, fontweight='bold', loc='left')
+        wc_path = os.path.join(outdir, "figure_5_wordcloud_ai.png")
+        plt.savefig(wc_path, dpi=300, bbox_inches='tight', facecolor='white', edgecolor='none')
+        plt.close()
+        print(f"✓ Created Figure 5: {wc_path}")
     
     print("\n" + "="*60)
     print("✓ All 3 IRAL figures created successfully!")
