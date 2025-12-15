@@ -78,7 +78,7 @@ For running on Google Colab or Kaggle notebooks:
 !python setup_environment.py
 ```
 
-📖 **See [CLOUD_SETUP.md](CLOUD_SETUP.md) for complete cloud setup guide**
+📖 **See [docs/CLOUD_SETUP.md](docs/CLOUD_SETUP.md) for complete cloud setup guide**
 
 
 ## ⚡ Quick Start & Complete Workflow

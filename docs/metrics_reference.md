@@ -1,3 +1,52 @@
+````markdown
+# Metrics Reference & Pipeline Guide
+
+**Complete reference for the 6 core linguistic metrics and step-by-step pipeline usage.**
+
+----
+
+## Table of Contents
+
+1. [Six Core Metrics Explained](#six-core-metrics-explained)
+2. [Pipeline Quick Start](#pipeline-quick-start)
+3. [Complete Pipeline Workflow](#complete-pipeline-workflow)
+4. [Output Files Reference](#output-files-reference)
+5. [Statistical Tests Explained](#statistical-tests-explained)
+6. [Troubleshooting](#troubleshooting)
+
+----
+
+## Six Core Metrics Explained
+
+### 1. MTLD (Measure of Textual Lexical Diversity)
+
+**What it measures:**  
+How varied the vocabulary is across the text.
+
+**How it is calculated:**
+1. Tokenize the text into alphabetic words (no punctuation)
+2. Scan left to right while computing a running Type–Token Ratio (TTR = unique_words / total_words)
+3. Each time TTR drops below a threshold (0.72), record a "factor"
+4. Continue scanning until the end
+5. MTLD = total_tokens / number_of_factors
+
+**Fallback for short texts (< 50 tokens):**
+```
+MTLD = (unique_words / total_words) * 100
+```
+
+**Why it matters:**  
+AI tends to produce artificially high lexical diversity because RLHF (Reinforcement Learning from Human Feedback) discourages repetition. Humans naturally repeat words more.
+
+... (content copied from docs/metrics_reference.md)
+
+Full content moved from top-level to keep the repository organized.
+'''markdown
+Contents moved from top-level METRICS_REFERENCE.md
+
+See the original guide in the repository root or use this organized docs copy.
+'''
+
 # Metrics Reference & Pipeline Guide
 
 **Complete reference for the 6 core linguistic metrics and step-by-step pipeline usage.**
