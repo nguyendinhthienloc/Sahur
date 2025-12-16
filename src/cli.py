@@ -48,7 +48,7 @@ def cli():
               help='Number of spaCy workers')
 @click.option('--batch-size', default=32, type=int,
               help='Batch size for parsing')
-@click.option('--enable-embeddings/--no-embeddings', default=False,
+@click.option('--enable-embeddings/--no-embeddings', default=True,
               help='Enable sentence embeddings for s2s_cosine metric')
 @click.option('--cache-dir', default=None, type=click.Path(),
               help='Cache directory for parsed docs (default: output_dir/cache)')
@@ -128,9 +128,9 @@ def run(input_path, output_dir, text_col, label_col, topic_col, max_rows,
     
     logger.info(f"Extracted features for {len(features_df)} documents")
     
-    # Step 3: Statistical analysis
+    # Step 3: Statistical analysis (always run if possible)
     logger.info("\n[3/5] Performing statistical analysis...")
-    
+    stats_results = None
     if 'label' in features_df.columns:
         from src.stats_analysis import compare_one_vs_many
         stats_results = compare_one_vs_many(
@@ -145,9 +145,8 @@ def run(input_path, output_dir, text_col, label_col, topic_col, max_rows,
         logger.info(f"Statistical tests saved to {stats_dir / 'statistical_tests.csv'}")
     else:
         logger.warning("No 'label' column found, skipping statistical comparison")
-        stats_results = None
-    
-    # Step 4: IRAL lexical analysis (multi-corpus, 1-vs-N)
+
+    # Step 4: IRAL lexical analysis (always run if possible)
     from src.iral.iral_cli import run_iral_cli
     logger.info("\n[4/5] Running IRAL lexical analysis (multi-corpus 1-vs-N)...")
     run_iral_cli(features_df, output_dir, group_col='label', text_col='text', reference_group='Human_story')
