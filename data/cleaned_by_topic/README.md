@@ -14,22 +14,22 @@
 
 | Topic | Count | File |
 |-------|------:|------|
-| ARTS | 306 | `arts.csv` |
-| BUSINESS | 233 | `business.csv` |
-| CRIME | 100 | `crime.csv` |
-| EDUCATION | 181 | `education.csv` |
-| ENTERTAINMENT | 806 | `entertainment.csv` |
-| ENVIRONMENT | 40 | `environment.csv` |
-| FASHION | 141 | `fashion.csv` |
-| FOOD | 141 | `food.csv` |
-| HEALTH | 366 | `health.csv` |
-| LOCAL_NEWS | 61 | `local_news.csv` |
-| POLITICS | 1,187 | `politics.csv` |
-| SCIENCE | 88 | `science.csv` |
-| SPORTS | 329 | `sports.csv` |
-| TECHNOLOGY | 1,459 | `technology.csv` |
-| TRAVEL | 61 | `travel.csv` |
-| WORLD_NEWS | 78 | `world_news.csv` |
+| ARTS | 306 | `arts.csv` | Done
+| BUSINESS | 233 | `business.csv` | Done
+| CRIME | 100 | `crime.csv` | Done
+| EDUCATION | 181 | `education.csv` | Ky
+| ENTERTAINMENT | 806 | `entertainment.csv` | Done
+| ENVIRONMENT | 40 | `environment.csv` | Done 
+| FASHION | 141 | `fashion.csv` | Done
+| FOOD | 141 | `food.csv` | Lạc
+| HEALTH | 366 | `health.csv` | Lộc
+| LOCAL_NEWS | 61 | `local_news.csv` | Done
+| POLITICS | 1,187 | `politics.csv` | Done 
+| SCIENCE | 88 | `science.csv` | Kỳ
+| SPORTS | 329 | `sports.csv` | Lạc
+| TECHNOLOGY | 1,459 | `technology.csv` | Done
+| TRAVEL | 61 | `travel.csv` | Lạc
+| WORLD_NEWS | 78 | `world_news.csv` | Tài
 
 ## Data Columns
 

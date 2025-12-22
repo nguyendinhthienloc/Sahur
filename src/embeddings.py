@@ -48,8 +48,13 @@ def get_embedding_model(model_name: str = "all-MiniLM-L6-v2"):
             "Install with: pip install sentence-transformers"
         )
     
-    logger.info(f"Loading embedding model: {model_name}")
-    _EMBEDDING_MODEL = SentenceTransformer(model_name)
+    import torch
+    device = 'cuda' if torch.cuda.is_available() else 'cpu'
+    logger.info(f"Loading embedding model: {model_name} on device: {device}")
+    _EMBEDDING_MODEL = SentenceTransformer(model_name, device=device)
+    logger.info(f"Model assigned to device: {_EMBEDDING_MODEL.device}")
+    if device == 'cuda':
+        logger.info(f"GPU detected: {torch.cuda.get_device_name(0)}")
     logger.info(f"Model loaded: {model_name}")
     
     return _EMBEDDING_MODEL

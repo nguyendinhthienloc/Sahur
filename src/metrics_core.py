@@ -330,7 +330,7 @@ def extract_core_metrics(doc: spacy.tokens.Doc,
     # Check document validity
     word_count = sum(1 for token in doc if token.is_alpha)
     
-    if word_count < 20:
+    if word_count < 50:
         logger.warning(f"Document {doc_id or 'unknown'} too short ({word_count} words), returning NaN")
         return {
             'mtld': np.nan,

@@ -12,6 +12,9 @@ from pathlib import Path
 import pandas as pd
 import logging
 
+# Prevent __pycache__ generation in src
+sys.dont_write_bytecode = True
+
 from .utils import setup_logger, write_metrics_schema
 from .ingest import load_data
 from .pipeline import run_pipeline
