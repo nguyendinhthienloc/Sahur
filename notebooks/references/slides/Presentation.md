@@ -41,14 +41,14 @@ style: |
 
 **Subject:** SC203 - Scientific Method
 **Research Team:** Sahur
-**Dataset:** 58k Samples (Roy et al., 2025)
+**Dataset:** Roy et al. (2025) Subset
 
 ---
 
 # Agenda
 
 1. **Motivation**: The "Arms Race" of Generative AI.
-2. **The Dataset**: 58k samples from NYT vs. 6 LLMs.
+2. **The Dataset**: Roy et al. (2025) & Data Engineering.
 3. **Pipeline Architecture**: From Ingestion to Parquet.
 4. **The 6 Core Metrics**: Definitions & **Calculation Logic**.
 5. **Lexical Analysis**: IRAL Log-Odds Ratio.
@@ -92,7 +92,8 @@ Instead of opaque neural networks, we propose a **Linguistic Baseline** using 6 
 
 We utilize the **"Comprehensive Dataset for Human vs. AI Generated Text Detection"**.
 
-- **Scale:** **58,000+** text samples.
+- **Source Scale:** **58,000+** text samples (Full Dataset).
+- **Our Focus:** **Training Split** (~7,300 rows) for deep linguistic analysis.
 - **Human Baseline:** New York Times (NYT) articles (High-quality, edited journalism).
 - **AI Contenders:** 6 Models generated from abstract prompts:
   - Gemma-2-9b, Mistral-7B, Qwen-2-72B
@@ -119,9 +120,9 @@ We fulfill the dataset's call for **Feature Engineering**:
 Based on our project architecture:
 
 1.  **Ingestion:** Raw CSVs from Roy et al. loaded via `src.cli`.
-2.  **Curation:** Shortlisted **25 high-quality rows** per topic (25x7 samples).
-    - *Selection Criteria:* Long paragraphs rich in sentence structure (Manual + AI assisted).
-    - *Exclusion:* Video logs/transcripts (common in Environment shard, which had only 40 rows).
+2.  **Curation:** Shortlisted **25 high-quality rows** per topic (for Balanced Benchmarking).
+    - *Reasoning:* Ensures fair comparison between large shards (Tech: 1,459) and small shards (Environment: 40).
+    - *Selection:* Long paragraphs rich in sentence structure (Manual + AI assisted).
 3.  **Sanitization:**
     - Removal of nulls and artifacts.
     - Alignment of `human_story` vs. `model_output` columns.
@@ -133,8 +134,8 @@ Based on our project architecture:
 
 To ensure metrics hold true across diverse contexts, we implemented a rigorous **16-shard strategy**:
 
-- **Major Shards:** Technology (1,459), Politics (1,187), Entertainment (806).
-- **Niche Shards:** Environment (40), Travel (61), Science (88).
+- **Major Shards (Raw):** Technology (1,459), Politics (1,187), Entertainment (806).
+- **Niche Shards (Raw):** Environment (40), Travel (61), Science (88).
 
 **Processing Statistics:**
 | Stage | Count | Notes |
@@ -495,7 +496,7 @@ We have rigorously tested our pipeline across the entire dataset landscape to en
 
 - **Breadth:** 16 distinct topic shards (Politics, Tech, Fashion, etc.).
 - **Depth:** 6 AI Models + Human Baseline.
-- **Volume:** ~58,000 rows processed.
+- **Volume:** **~5,500** rows processed (Cleaned Subset).
 - **Rigor:**
   - Every row tagged with 6 metrics.
   - Statistical significance (p-values) calculated for every comparison.
@@ -610,20 +611,38 @@ Our `src` codebase is built for reproducibility and scalability:
 
 ---
 
-# Limitations
+# Tools & Technologies
 
-1.  **Genre Bias:** Our baseline is Journalism (NYT). Scientific papers might differ (e.g., higher passive voice).
-2.  **Model Evolution:** GPT-4o is better at mimicking human variance than older models.
-3.  **Prompt Sensitivity:** AI style changes heavily based on the prompt (e.g., "Write like a scientist").
-4.  **Data Hygiene vs. Rankings:** While absolute numbers may shift slightly due to residual noise, the **relative rankings** (Human vs. AI) remain stable and statistically significant.
+We leveraged a modern Python ecosystem to build a scalable, reproducible pipeline.
+
+**Core Libraries:**
+- **NLP & Parsing:** `spaCy` (Dependency Trees), `lexicalrichness` (MTLD).
+- **S2S Extraction:** `sentence-transformers` (Model: `all-MiniLM-L6-v2`).
+  - *Why?* High speed/accuracy balance for semantic similarity.
+- **Data & Stats:** `pandas`, `scipy`, `statsmodels` (Welch's T-test).
+- **Visualization:** `seaborn`, `matplotlib`.
+
+> **Infrastructure:** The pipeline processes the dataset locally using efficient Parquet storage (`pyarrow`).
+
+---
+
+# Limitations & Challenges
+
+1.  **Preprocessing Complexity:** NLP sanitization was extremely difficult. We relied on AI assistance to navigate the noise in raw web-scraped text.
+2.  **Tooling Constraints:** While `spaCy` is powerful, achieving full control over the dataset's linguistic nuances requires more time than available.
+3.  **Dataset Selection:** We discarded two cleaner datasets because they used older AI models. We chose *Roy et al. (2025)* to benchmark against modern LLMs (GPT-4o), accepting the trade-off of "noisier" data.
+4.  **Genre Bias:** Our baseline is Journalism (NYT). Scientific papers might differ (e.g., higher passive voice).
+5.  **Modeling Scope:** Our current focus is **Feature Engineering**. Expanding to production-grade ML classifiers requires further expertise.
 
 ---
 
 # Conclusion & Next Steps
 
 1.  **Conclusion:** A "White Box" pipeline offers a transparent baseline, not just for detection, but for **education**.
-2.  **Future Application:** This system will serve as the backend for a tool helping learners "notice, imitate, and acquire" advanced language patterns.
-3.  **The Vision:** Bridging the gap between **AI efficiency** (grammar/speed) and **Human creativity** (burstiness/hedging).
+2.  **Future Application:** Developing a **Hybrid Writing Tool** for Educational Technology.
+    - *Goal:* Retain the writer's original **effort, style, and tone**.
+    - *Benefit:* Help L2 writers reduce errors and sound more academic without losing their voice.
+3.  **The Vision:** Bridging the gap between **AI efficiency** and **Human creativity**.
 
 ---
 
