@@ -50,7 +50,7 @@ style: |
 1. **Motivation**: The "Arms Race" of Generative AI.
 2. **The Dataset**: Roy et al. (2025) & Data Engineering.
 3. **Pipeline Architecture**: From Ingestion to Parquet.
-4. **The 6 Core Metrics**: Definitions & **Calculation Logic**.
+4. **The 6 Core Metrics**: Definitions & Calculation Logic.
 5. **Lexical Analysis**: IRAL Log-Odds Ratio.
 6. **Findings & Discussion**: Interpreting the "Human Fingerprint".
 
@@ -78,12 +78,12 @@ style: |
 
 ---
 
-# Our Approach: "White Box" Detection
+# Our Approach: Linguistic Analysis Pipeline
 
 Instead of opaque neural networks, we propose a **Linguistic Baseline** using 6 explainable metrics.
 
-### Why "White Box"?
-1.  **Explainability:** We can point to *why* a text is flagged (e.g., "Too repetitive", "Lack of hedging").
+### Why Explainable Metrics?
+1.  **Explainability:** We can point to *why* a text differs (e.g., "Too repetitive", "Lack of hedging").
 2.  **Scientific Grounding:** Based on linguistic features proven to differentiate human/AI writing, such as lexical diversity and sentence complexity.
 
 ---
@@ -110,7 +110,7 @@ We fulfill the dataset's call for **Feature Engineering**:
 > "Investigate linguistic, stylistic, and semantic features that are indicative of AI generation... to capture nuanced patterns." — *Roy et al. (2025)*
 
 **Project Trajectory:**
-1.  **Current Phase (SC203):** Feature Engineering (The "White Box" Pipeline).
+1.  **Current Phase (SC203):** Feature Engineering (The Explainable Pipeline).
 2.  **Future Phase:** Developing Robust Classifiers (High-Ranked Research Goal).
 
 ---
@@ -273,7 +273,7 @@ Using `spaCy` dependency parsing, we calculate the maximum depth from the `ROOT`
 - Stylistic fingerprint. Scientific humans prefer Passive; Journalism prefers Active (*Desaire et al., 2023*).
 - AI generally defaults to Active voice unless prompted otherwise.
 
-**Detection Logic:**
+**Extraction Logic:**
 Locate dependency tag `nsubjpass` (nominal subject passive) + `auxpass`.
 
 ---
@@ -381,7 +381,7 @@ $$\text{Log Odds} = \ln \left( \frac{\text{Freq}(W)_{\text{AI}} + 0.5}{\text{Fre
 
 ---
 
-# Inside `iral_lexical.py`: The Math
+# Inside `iral_lexical.py`: The Reimplementation of the Baseline
 
 We implemented the **Log-Odds Ratio with Informative Dirichlet Prior** directly in Python.
 
@@ -442,97 +442,13 @@ Humans will have a higher **Modal/Epistemic Rate**.
 ---
 
 
-# Detection Performance: Politics
-
-<img src="results/heatmaps/Politics_Heatmap.png" height="550" style="display: block; margin: 0 auto;">
-
----
-
-# Detection Performance: World News
-
-<img src="results/heatmaps/WorldNews_Heatmap.png" height="550" style="display: block; margin: 0 auto;">
-
----
-
-# Detection Performance: Local News
-
-<img src="results/heatmaps/LocalNews_Heatmap.png" height="550" style="display: block; margin: 0 auto;">
-
----
-
-# Detection Performance: Crime
-
-<img src="results/heatmaps/Crime_Heatmap.png" height="550" style="display: block; margin: 0 auto;">
-
----
-
-# Detection Performance: Technology
-
-<img src="results/heatmaps/Technology_Heatmap.png" height="550" style="display: block; margin: 0 auto;">
-
----
-
-# Detection Performance: Business
-
-<img src="results/heatmaps/Business_Heatmap.png" height="550" style="display: block; margin: 0 auto;">
-
----
-
-# Detection Performance: Health
-
-<img src="results/heatmaps/Health_Heatmap.png" height="550" style="display: block; margin: 0 auto;">
-
----
-
-# Detection Performance: Environment
-
-<img src="results/heatmaps/Environment_Heatmap.png" height="550" style="display: block; margin: 0 auto;">
-
----
-
-# Validation at Scale
-
-We have rigorously tested our pipeline across the entire dataset landscape to ensure robustness.
-
-- **Breadth:** 16 distinct topic shards (Politics, Tech, Fashion, etc.).
-- **Depth:** 6 AI Models + Human Baseline.
-- **Volume:** **~5,500** rows processed (Cleaned Subset).
-- **Rigor:**
-  - Every row tagged with 6 metrics.
-  - Statistical significance (p-values) calculated for every comparison.
-
----
-
-# Detection Performance: Arts
-
-<img src="results/heatmaps/Arts_Heatmap.png" height="550" style="display: block; margin: 0 auto;">
-
----
-
-# Detection Performance: Entertainment
-
-<img src="results/heatmaps/Entertainment_Heatmap.png" height="550" style="display: block; margin: 0 auto;">
-
----
-
-# Detection Performance: Fashion
-
-<img src="results/heatmaps/Fashion_Heatmap.png" height="550" style="display: block; margin: 0 auto;">
-
----
-
-# Detection Performance: Travel
-
-<img src="results/heatmaps/Travel_Heatmap.png" height="550" style="display: block; margin: 0 auto;">
-
----
 
 # Cross-Topic Analysis & Synthesis
 ## Interpreting the Heatmaps
 
 * **Variance Analysis:**
-    * *Question:* Do we observe higher detection accuracy in **Specialized Sectors** (Tech/Health) compared to **Lifestyle** topics?
-    * *Hypothesis:* Technical vocabulary may limit the "creativity" of LLMs, making them easier to detect or attribute.
+    * *Question:* Do we observe clearer differentiation in **Specialized Sectors** (Tech/Health) compared to **Lifestyle** topics?
+    * *Hypothesis:* Technical vocabulary may limit the "creativity" of LLMs, making them easier to differentiate or attribute.
 * **Model-Specific Patterns:**
     * *Observation:* Which model (Gemma, Mistral, Qwen, etc.) shows the most consistent heatmap signature across all 3 clusters?
 * **Outliers:**
@@ -540,18 +456,6 @@ We have rigorously tested our pipeline across the entire dataset landscape to en
 
 ---
 
-# Statistical Significance
-
-To validate these metrics, we use **Welch's t-test** and **Cohen's d**.
-
-**Cohen's d Interpretation:**
-- $d = 0.2$: Small effect
-- $d = 0.5$: Medium effect
-- $d > 0.8$: **Large effect** (Strong predictor for classification)
-
-*We expect **S2S Similarity** and **Clause Complexity** to show Large Effects.*
-
----
 
 # Interpretation of the Numbers
 
@@ -638,7 +542,7 @@ We leveraged a modern Python ecosystem to build a scalable, reproducible pipelin
 
 # Conclusion & Next Steps
 
-1.  **Conclusion:** A "White Box" pipeline offers a transparent baseline, not just for detection, but for **education**.
+1.  **Conclusion:** An explainable pipeline offers a transparent baseline, not just for differentiation, but for **education**.
 2.  **Future Application:** Developing a **Hybrid Writing Tool** for Educational Technology.
     - *Goal:* Retain the writer's original **effort, style, and tone**.
     - *Benefit:* Help L2 writers reduce errors and sound more academic without losing their voice.
