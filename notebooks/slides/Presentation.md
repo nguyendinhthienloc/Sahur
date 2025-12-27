@@ -303,6 +303,22 @@ $$S_{sim} = \cos(\vec{v}_n, \vec{v}_{n+1}) = \frac{\vec{v}_n \cdot \vec{v}_{n+1}
 
 ---
 
+# Metric 6: Calculation Example
+
+**Model Used:** `all-MiniLM-L6-v2` (via `sentence-transformers`).
+
+**Scenario 1: High Similarity (AI Tendency)**
+> **S1:** "The algorithm optimizes for efficiency."
+> **S2:** "The code runs faster to save time."
+> **Score:** $\approx 0.82$ (High Semantic Overlap)
+
+**Scenario 2: Low Similarity (Human Tendency)**
+> **S1:** "The algorithm optimizes for efficiency."
+> **S2:** "However, user privacy remains a concern."
+> **Score:** $\approx 0.28$ (Semantic Jump)
+
+---
+
 # Evolution from Baseline (Herbold et al., 2023)
 
 **Article:** *"A large-scale comparison of human-written versus ChatGPT-generated essays"*
@@ -338,6 +354,7 @@ if lemma_lower != text_lower:
 ---
 
 # Reimplementation of the IRAL Research
+Our project started off as a reimplementation of this article's  pipeline in Python
 
 **Source:** *Zhang & Crosthwaite (2025)* - "More human than human?" (IRAL).
 
@@ -352,6 +369,7 @@ if lemma_lower != text_lower:
 > **Why?** PMI allows us to detect highly specific "hallucinations" or rare token bindings that act as strong model signatures, even if they appear infrequently.
 
 ---
+
 
 # Methodology Upgrade: From R to Python
 
@@ -406,7 +424,9 @@ Instead of manual plotting in R Studio, our pipeline automatically generates:
 We moved from "analyzing a CSV" to a **push-button explainability engine** that instantly visualizes the linguistic divergence of any new model we test.
 
 ---
+IRAL CHARTS GO HERE 
 
+---
 # Lexical Findings (Hypothesized)
 
 Based on IRAL literature:
@@ -455,7 +475,9 @@ Humans will have a higher **Modal/Epistemic Rate**.
     * *Note:* Identify any topic (e.g., **Fashion**) where the heatmap significantly deviates from the average baseline accuracy.
 
 ---
+HEATMAPS GO HERE
 
+---
 
 # Interpretation of the Numbers
 
@@ -561,7 +583,7 @@ We leveraged a modern Python ecosystem to build a scalable, reproducible pipelin
 7.  **Zhu et al. (2025).** *Enhancing EFL argumentative writing through an AI-powered corpus.* CALL.
 8.  **Durak et al. (2025).** *A Comparison of Human-Written Versus AI-Generated Text...* European Journal of Education.
 9.  **Al Bataineh et al. (2025).** *AI-Generated vs. Human Text: Introducing a New Dataset...* IEEE Transactions on AI.
-10. **Project Code:** `AIvsHuman` Pipeline README.
+
 
 ---
 
