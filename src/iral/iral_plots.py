@@ -12,6 +12,38 @@ import matplotlib.patches as mpatches
 from matplotlib.patches import FancyBboxPatch, FancyArrowPatch
 
 
+# Minimal stop list for word clouds (lowercased)
+_WC_STOPWORDS = {
+    'the', 'an', 'and', 'or', 'of', 'from', 'to', 'in', 'on', 'for', 'with', 'by',
+    'a', 'at', 'is', 'are', 'was', 'were', 'be', 'been', 'being', 'this', 'that',
+    'these', 'those', 'it', 'its', 'as', 'but', 'if', 'then', 'else', 'when', 'while',
+    'i', 'you', 'he', 'she', 'we', 'they', 'me', 'him', 'her', 'us', 'them', 'my',
+    'your', 'our', 'their', 'mine', 'yours', 'ours', 'theirs', 'et', 'al',
+    'has', 'have', 'having', 'do', 'does', 'doing', 'did', 'not', 'no'
+}
+
+
+def _wordcloud_frequencies(pairs):
+    """Build frequency dict excluding numbers, stopwords, and non-words."""
+    if not pairs:
+        return {}
+    frequencies = {}
+    for word, score in pairs:
+        if not word:
+            continue
+        w = str(word).lower().strip()
+        if not w or w.isdigit() or w in _WC_STOPWORDS:
+            continue
+        try:
+            val = abs(float(score))
+        except Exception:
+            continue
+        if val <= 0:
+            continue
+        frequencies[w] = val
+    return frequencies
+
+
 # Set IRAL journal style
 plt.rcParams.update({
     'font.family': 'serif',
@@ -227,7 +259,7 @@ def create_three_iral_figures(keywords_group_0, keywords_group_1, outdir,
 
     # Figure 4: Word cloud for human group
     if keywords_group_0:
-        word_freq = {w: abs(float(s)) for w, s in keywords_group_0}
+        word_freq = _wordcloud_frequencies(keywords_group_0)
         wc = WordCloud(width=800, height=400, background_color='white', colormap='tab20', prefer_horizontal=1.0)
         wc.generate_from_frequencies(word_freq)
         plt.figure(figsize=(8, 4), dpi=300)
@@ -251,7 +283,7 @@ def create_three_iral_figures(keywords_group_0, keywords_group_1, outdir,
 
     # Figure 5: Word cloud for AI group
     if keywords_group_1:
-        word_freq = {w: abs(float(s)) for w, s in keywords_group_1}
+        word_freq = _wordcloud_frequencies(keywords_group_1)
         wc = WordCloud(width=800, height=400, background_color='white', colormap='tab20', prefer_horizontal=1.0)
         wc.generate_from_frequencies(word_freq)
         plt.figure(figsize=(8, 4), dpi=300)
