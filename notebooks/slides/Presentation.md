@@ -39,6 +39,11 @@ style: |
   table.wordcloud { width: 100%; text-align: center; border-collapse: collapse; }
   table.wordcloud td { padding: 8px; }
   table.wordcloud img { width: 250px; height: auto; display: block; margin: 0 auto 6px; }
+
+  /* Heatmap grid */
+  table.heatmap { width: 100%; text-align: center; border-collapse: collapse; }
+  table.heatmap td { padding: 8px; }
+  table.heatmap img { width: 200px; height: auto; display: block; margin: 0 auto 6px; }
 ---
 
 # Human vs. AI Text Classification
@@ -456,6 +461,76 @@ We moved from "analyzing a CSV" to a **push-button explainability engine** that 
 </table>
 
 ---
+# Heatmaps
+
+<table class="heatmap">
+  <tr>
+    <td>
+      <img src="./Heatmap/Arts.png" alt="Arts Heatmap" />
+      <br><strong>Arts</strong>
+    </td>
+    <td>
+      <img src="./Heatmap/Business.png" alt="Business Heatmap" />
+      <br><strong>Business</strong>
+    </td>
+    <td>
+      <img src="./Heatmap/Entertainment.png" alt="Entertainment Heatmap" />
+      <br><strong>Entertainment</strong>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <img src="./Heatmap/Environment.png" alt="Environment Heatmap" />
+      <br><strong>Environment</strong>
+    </td>
+    <td>
+      <img src="./Heatmap/Fashion.png" alt="Fashion Heatmap" />
+      <br><strong>Fashion</strong>
+    </td>
+    <td>
+      <img src="./Heatmap/Health.png" alt="Health Heatmap" />
+      <br><strong>Health</strong>
+    </td>
+  </tr>
+</table>
+
+---
+
+# Heatmaps
+
+<table class="heatmap">
+  <tr>
+    <td>
+      <img src="./Heatmap/LocalNews.png" alt="LocalNews Heatmap" />
+      <br><strong>LocalNews</strong>
+    </td>
+    <td>
+      <img src="./Heatmap/Politics.png" alt="Politics Heatmap" />
+      <br><strong>Politics</strong>
+    </td>
+    <td>
+      <img src="./Heatmap/Science.png" alt="Science Heatmap" />
+      <br><strong>Science</strong>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <img src="./Heatmap/Technology.png" alt="Technology Heatmap" />
+      <br><strong>Technology</strong>
+    </td>
+    <td>
+      <img src="./Heatmap/Travel.png" alt="Travel Heatmap" />
+      <br><strong>Travel</strong>
+    </td>
+    <td>
+      <img src="./Heatmap/Crime.png" alt="Crime Heatmap" />
+      <br><strong>Crime</strong>
+    </td>
+  </tr>
+</table>
+
+
+---
 # Lexical Findings (Hypothesized)
 
 Based on IRAL literature:
@@ -503,10 +578,6 @@ Humans will have a higher **Modal/Epistemic Rate**.
 * **Outliers:**
     * *Note:* Identify any topic (e.g., **Fashion**) where the heatmap significantly deviates from the average baseline accuracy.
 
----
-HEATMAPS GO HERE
-
----
 
 # Interpretation of the Numbers
 
