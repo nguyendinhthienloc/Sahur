@@ -133,20 +133,7 @@ We fulfill the dataset's call for **Feature Engineering**:
 
 ---
 
-# Data Cleaning & Pipeline
 
-Based on our project architecture:
-
-1.  **Ingestion:** Raw CSVs from Roy et al. loaded via `src.cli`.
-2.  **Curation:** Shortlisted **25 high-quality rows** per topic (for Balanced Benchmarking).
-    - *Reasoning:* Ensures fair comparison between large shards (Tech: 1,459) and small shards (Environment: 40).
-    - *Selection:* Long paragraphs rich in sentence structure (Manual + AI assisted).
-3.  **Sanitization:**
-    - Removal of nulls and artifacts.
-    - Alignment of `human_story` vs. `model_output` columns.
-4.  **Processing:** Sharded processing with `spaCy` and `DuckDB` (Parquet output).
-
----
 
 # Data Engineering: Topic Sharding
 
@@ -161,6 +148,20 @@ To ensure metrics hold true across diverse contexts, we implemented a rigorous *
 | **Input** | 7,321 | Raw rows (Training Set) |
 | **Filtered** | 1,744 | Removed (Timeouts/Errors) |
 | **Final** | **5,577** | High-fidelity rows |
+
+---
+# Data Cleaning & Pipeline
+
+Based on our project architecture:
+
+1.  **Ingestion:** Raw CSVs from Roy et al. loaded via `src.cli`.
+2.  **Curation:** Shortlisted **25 high-quality rows** per topic (for Balanced Benchmarking).
+    - *Reasoning:* Ensures fair comparison between large shards (Tech: 1,459) and small shards (Environment: 40).
+    - *Selection:* Long paragraphs rich in sentence structure (Manual + AI assisted).
+3.  **Sanitization:**
+    - Removal of nulls and artifacts.
+    - Alignment of `human_story` vs. `model_output` columns.
+4.  **Processing:** Sharded processing with `spaCy` and `DuckDB` (Parquet output).
 
 ---
 
@@ -444,7 +445,7 @@ We moved from "analyzing a CSV" to a **push-button explainability engine** that 
 ---
 
 # Wordcloud Visualization: Lexical Signatures
-
+**Example** Topic: Arts
 <table class="wordcloud">
   <tr>
     <td><img src="./Wordcloud/wordcloud_human_story.png"><br><strong>Human (NYT)</strong></td>
@@ -531,15 +532,20 @@ We moved from "analyzing a CSV" to a **push-button explainability engine** that 
 
 
 ---
-# Lexical Findings (Hypothesized)
+# Lexical Findings — Politics (Collocation Summary)
 
-Based on IRAL literature:
+Below is a concise summary table of the top collocation bigrams (PMI) from the `politics_shard_run` lexical outputs, alongside the collocation bar figures produced by the pipeline. Left column lists the top 5 Human bigrams; right column lists the top 5 GPT‑4o bigrams (from `lexical_collocation_summary.csv`).
 
-| Category | Human Words | AI Words |
-| :--- | :--- | :--- |
-| **Themes** | *Leaders, Food, Career, Youtube* | *Sustainable, Educational, Technical* |
-| **Style** | *Said, Reported, Years* | *Delve, Landscape, Crucial, Pivotal* |
-| **Type** | Concrete Entities | Abstract Concepts |
+| Rank | Human (bigram — PMI) | GPT‑4o (bigram — PMI) |
+| :---: | :--- | :--- |
+| 1 | yamiche alcindor — 13.19 | total votes — 11.25 |
+| 2 | marshall islands — 12.97 | pickup trucks — 11.03 |
+| 3 | kamala harris — 12.97 | sierra leone — 11.03 |
+| 4 | salt lake — 12.95 | jeb bush — 10.99 |
+| 5 | luther king — 12.76 | lower manhattan — 10.52 |
+
+
+- **Note:** Bars show PMI (y-axis) for top bigrams (x-axis). Higher bars indicate stronger within‑group collocation strength. Frequency cutoffs (min_count) were applied when extracting bigrams to reduce noise.
 
 ---
 
@@ -578,7 +584,7 @@ Humans will have a higher **Modal/Epistemic Rate**.
 * **Outliers:**
     * *Note:* Identify any topic (e.g., **Fashion**) where the heatmap significantly deviates from the average baseline accuracy.
 
-
+---
 # Interpretation of the Numbers
 
 | GPT-4o | Human Writing | Llama-8B |
