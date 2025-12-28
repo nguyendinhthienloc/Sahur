@@ -78,13 +78,21 @@ style: |
 
 ---
 
-# Our Approach: Linguistic Analysis Pipeline
+# Our Approach: Software-Level Linguistic Analysis Pipeline
 
-Instead of opaque neural networks, we propose a **Linguistic Baseline** using 6 explainable metrics.
+We implement a full software pipeline (not just metric extraction) that is production-ready, modular, and reproducible. This is an engineering-first project combining NLP research and software best practices.
 
-### Why Explainable Metrics?
-1.  **Explainability:** We can point to *why* a text differs (e.g., "Too repetitive", "Lack of hedging").
-2.  **Scientific Grounding:** Based on linguistic features proven to differentiate human/AI writing, such as lexical diversity and sentence complexity.
+---
+### Why a Software-Level Pipeline?
+- **Engineering Focus:** Designed for long-term maintenance, extensibility, and integration into other systems (APIs, dashboards, CI).
+- **Reproducibility:** Deterministic preprocessing, cached `spaCy` parses, and Parquet artifacts to enable bit-for-bit reproducible experiments.
+- **Observability:** Built-in logging, error handling, and failure isolation so large batches don't fail silently.
+- **Pluggable Metrics:** Each feature in `src/metrics_core.py` is stateless and testable, enabling safe replacements and experiments.
+---
+### What this enables
+- Rapid A/B testing of metrics and model attributions.
+- Automated report generation, visualizations, and deployable microservices.
+- Clear boundaries between data, compute, and presentation layers for easier audits and education.
 
 ---
 
@@ -534,6 +542,57 @@ Our `src` codebase is built for reproducibility and scalability:
 - **`stats_analysis.py`**:  Automated Welch’s t-tests and Cohen’s d calculation.
 
 > **Why this matters:** Modular design allowed us to rapidly swap out metrics and upgrade the IRAL component without breaking the ingestion logic.
+
+---
+
+# Engineering Highlights
+
+- **Deterministic preprocessing:** deterministic tokenization, seedable sharding, and cached parse outputs to avoid nondeterminism between runs.
+- **Failure isolation:** per-shard retries, timeouts, and DuckDB-based recovery for partial failures.
+- **Data contracts:** YAML-driven `metrics_config.yaml` enforces expected schema and sampling rules, enabling safe upgrades.
+- **Performance:** batch-parsing with `spaCy` and vectorized operations in `pandas`/`pyarrow` to process tens of thousands of documents efficiently.
+
+---
+
+# Reproducibility & Packaging
+
+- **Environment:** `requirements.txt` + `setup_environment.py` to pin versions and bootstrap the environment.
+- **Caching:** Parquet caches produced by `parse_and_cache.py` are canonical experiment inputs for metrics and plots.
+- **Artifacts:** All experiments export deterministic Parquet + PNG/SVG results that can be reproduced from the same inputs.
+
+---
+
+# Testing, CI & Quality Gates
+
+- **Unit tests:** `tests/` cover `metrics_core.py`, `ingest.py`, and `parse_and_cache.py` (run with `pytest`).
+- **Integration tests:** end-to-end pipeline run on small sample shards via `tests/test_pipeline_endtoend.py`.
+- **CI recommendations:** run `pytest`, linting, and a sample `parse_and_cache` job in CI to catch regressions early.
+
+---
+
+# APIs & Integration
+
+- Expose metrics as a lightweight API or microservice for downstream dashboards.
+- Provide a CLI in `src/cli.py` for reproducible experiment runs and targeted re-processing.
+- Bundle models/embeddings downloads (e.g., sentence-transformers) into the setup flow to reduce first-run friction.
+
+---
+
+# Performance & Scaling Notes
+
+- Horizontal scaling via topic-level sharding: each shard is an independent unit of work.
+- Use `multiprocessing` or Kubernetes jobs to parallelize `parse_and_cache.py` across cores/nodes.
+- Monitor memory for embedding steps (`sentence-transformers`) and prefer streaming/mini-batching.
+
+---
+
+# Roadmap & Next Steps (Engineering)
+
+1.  Add a small HTTP server to expose metrics and visualizations for manual review.
+2.  Add a reproducible Docker image and a minimal Helm chart for deployment to cluster.
+3.  Add CI job to run a nightly sanity pipeline on a small representative sample.
+4.  Expand unit tests for edge-case cleaning and nominalization lemma checks.
+
 
 ---
 
