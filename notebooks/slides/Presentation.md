@@ -34,6 +34,11 @@ style: |
   tr:nth-child(even) {
     background-color: #f2f2f2;
   }
+
+  /* Wordcloud grid */
+  table.wordcloud { width: 100%; text-align: center; border-collapse: collapse; }
+  table.wordcloud td { padding: 8px; }
+  table.wordcloud img { width: 250px; height: auto; display: block; margin: 0 auto 6px; }
 ---
 
 # Human vs. AI Text Classification
@@ -432,7 +437,23 @@ Instead of manual plotting in R Studio, our pipeline automatically generates:
 We moved from "analyzing a CSV" to a **push-button explainability engine** that instantly visualizes the linguistic divergence of any new model we test.
 
 ---
-IRAL CHARTS GO HERE 
+
+# Wordcloud Visualization: Lexical Signatures
+
+<table class="wordcloud">
+  <tr>
+    <td><img src="./Wordcloud/wordcloud_human_story.png"><br><strong>Human (NYT)</strong></td>
+    <td><img src="./Wordcloud/wordcloud_gemma-2-9b.png"><br><strong>Gemma-2-9b</strong></td>
+    <td><img src="./Wordcloud/wordcloud_gpt_4-o.png"><br><strong>GPT-4o</strong></td>
+    <td><img src="./Wordcloud/wordcloud_llama-8b.png"><br><strong>LLaMA-8B</strong></td>
+  </tr>
+  <tr>
+    <td><img src="./Wordcloud/wordcloud_mistral-7b.png"><br><strong>Mistral-7B</strong></td>
+    <td><img src="./Wordcloud/wordcloud_qwen-2-72b.png"><br><strong>Qwen-2-72B</strong></td>
+    <td><img src="./Wordcloud/wordcloud_accounts-yi-01-ai-models-yi-large.png"><br><strong>Yi-Large</strong></td>
+    <td></td>
+  </tr>
+</table>
 
 ---
 # Lexical Findings (Hypothesized)
