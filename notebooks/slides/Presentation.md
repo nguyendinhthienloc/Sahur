@@ -18,7 +18,7 @@ style: |
     font-size: 20px; 
     border-collapse: collapse; 
     width: 100%; 
-    margin-top: 20px;
+    margin-top: 20px;`
   }
   th {
     background-color: #2c3e50; /* Matches H1 */
